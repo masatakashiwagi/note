@@ -1,2 +1,5 @@
 # note
-This is a repository for note.
+noteに載せる記事のメモなどを保管して置くためのレポジトリ
+
+### Streamlitを使ってデータを可視化
+目標（習慣）振り返り記事のためにメモしたログを可視化するために、Streamlitを使っています
