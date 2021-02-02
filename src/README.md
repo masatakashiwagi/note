@@ -16,3 +16,6 @@ Streamlitを立ち上げるために以下のコードを実行して、`http://
 ```python
 streamlit run streamlit_main.py
 ```
+## 画面イメージ
+サンプルで作成したイメージを載せておきます
+![サンプルイメージ](../image/sample_image1.png "サンプル")
