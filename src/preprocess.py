@@ -61,6 +61,7 @@ def main():
 	arguments = get_args()
 	input_file_path = arguments.input_file_path
 
+	# 前処理
 	preprocess(input_file_path)
 
 
