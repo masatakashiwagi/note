@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 import argparse
 import pandas as pd
 import numpy as np
@@ -23,46 +24,78 @@ def get_args():
     return parser.parse_args()
 
 
-def preprocess(path: str) -> None:
+class Preprocess:
 	"""Preprocess for dataframe."""
-	# データセットのロード
-	LOGGER.info("Load dataset.")
-	df = pd.read_csv(path, skiprows=1, header=0)
+	def __init__(self, path: str, params: Dict) -> None:
+		"""初期化"""
+		self.path = path
+		self.params = params
 
-	# 0行目は単位なので、削除する
-	LOGGER.info("Delete 0 rows for unit.")
-	df.drop(0, inplace=True)
+	@staticmethod
+	def _load_data(path: str, params: Dict) -> pd.DataFrame:
+		"""ファイルを読み込む.
+		
+		入力csvファイルをロードし、データフレームに変換する
+		"""
+		LOGGER.info(f"Load dataset from {path}.")
+		if os.path.isfile(path):
+			df = pd.read_csv(path, **params)
+			return df
+		else:
+			raise ValueError(f"'{path}' is not exist, check the file path.")
 
-	# NaNを0で埋める
-	LOGGER.info("Fill NaN with 0.")
-	df = df.fillna(0)
-	
-	# 日付をdatetime型に変換する
-	LOGGER.info("Convert date to datetime type.")
-	df["日付"] = pd.to_datetime(df["日付"])
+	@staticmethod
+	def _save_data(path: str, objects: pd.DataFrame):
+		"""ファイルを保存する.
+		
+		データフレームを出力csvファイルに保存する
+		"""
+		LOGGER.info(f"Save dataset to {path}.")
+		objects.to_csv(path, index=False)
 
-	# 不要なカラムを削除する
-	LOGGER.info("Delete unnecessary columns.")
-	drop_cols = []
-	for col in df.columns.tolist():
-	    if col[-1] == '1':
-	        drop_cols.append(col)
-	df.drop(drop_cols, axis=1, inplace=True)
+	def run(self):
+		"""前処理を実行する"""
+		# データロード
+		df = self._load_data(self.path, self.params)
 
-	# ファイルを保存する
-	LOGGER.info("Save output file.")
-	output_file = os.path.splitext(path)[0] + "_preprocess.csv"
-	df.to_csv(output_file, index=False)
+		# 前処理
+		# 0行目は単位なので、削除する
+		LOGGER.info("Delete 0 rows for unit.")
+		df.drop(0, inplace=True)
 
+		# NaNを0で埋める
+		LOGGER.info("Fill NaN with 0.")
+		df = df.fillna(0)
+		
+		# 日付をdatetime型に変換する
+		LOGGER.info("Convert date to datetime type.")
+		df["日付"] = pd.to_datetime(df["日付"])
+
+		# 不要なカラムを削除する
+		LOGGER.info("Delete unnecessary columns.")
+		drop_cols = []
+		for col in df.columns.tolist():
+			if col[-1] == '1':
+				drop_cols.append(col)
+		df.drop(drop_cols, axis=1, inplace=True)
+
+		# データを保存する
+		output_file = os.path.splitext(self.path)[0] + "_preprocess.csv"
+		self._save_data(output_file, df)
 
 
 def main():
 	"""Main function."""
 	arguments = get_args()
 	input_file_path = arguments.input_file_path
+	params = {
+		"skiprows": 1,
+		"header": 0
+	}
 
 	# 前処理
-	preprocess(input_file_path)
+	preprocess = Preprocess(input_file_path, params)
+	preprocess.run()
 
 
 if __name__ == "__main__":
