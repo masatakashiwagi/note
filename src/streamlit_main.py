@@ -34,7 +34,7 @@ df = pd.read_csv(glob.glob(path)[0])
 st.dataframe(df)
 
 # 集約したデータフレーム
-st.subheader('Display aggregate dataframe')
+st.subheader('Display aggregated dataframe')
 """
 集計したデータフレームの結果を確認する
 """
